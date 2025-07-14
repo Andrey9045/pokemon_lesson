@@ -22,7 +22,7 @@
       </div>
       <div class="m-2 ml-4 col-11 col-sm-8 col-lg-8 col-xl-8">
         <h1>{{pokemon.title}}</h1>
-        <p><b>{{pokemon.title}}</b> {{pokemon.jap_eng_title}} — {{pokemon.description}}</p>
+        <p><b>{{pokemon.title}}</b> ({{pokemon.jap_name}}/{{pokemon.eng_name}}) — {{pokemon.description}}</p>
         <hr>
         <div class="mt-4">
           {% if pokemon.next_evolution or pokemon.prev_evolution %}

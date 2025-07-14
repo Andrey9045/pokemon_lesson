@@ -71,14 +71,14 @@ def show_pokemon(request, pokemon_id):
     relative_image_path = requested_pokemon.photo.url if requested_pokemon.photo else DEFAULT_IMAGE_URL
     image_url = request.build_absolute_uri(relative_image_path)
 
-    if requested_pokemon.evolution:
-        evo_prev_img = requested_pokemon.evolution.photo.url if requested_pokemon.evolution.photo else DEFAULT_IMAGE_URL
-        evo_prev_title = requested_pokemon.evolution.title
+    if requested_pokemon.evolves:
+        evo_prev_img = requested_pokemon.evolves.photo.url if requested_pokemon.evolves.photo else DEFAULT_IMAGE_URL
+        evo_prev_title = requested_pokemon.evolves.title
     else:
         evo_prev_img = None
         evo_prev_title = None
 
-    evo = requested_pokemon.evolutions.first()
+    evo = requested_pokemon.evo.first()
     if evo:
         evo_next_img = evo.photo.url if evo.photo else DEFAULT_IMAGE_URL
         evo_next_title = evo.title
@@ -90,8 +90,9 @@ def show_pokemon(request, pokemon_id):
        'title': requested_pokemon.title,
        'img_url': image_url,
        'description': requested_pokemon.description,
-       'jap_eng_title': requested_pokemon.jap_eng_title,
-       'prev_evolution': requested_pokemon.evolution,  # Передаем объект
+       'jap_name': requested_pokemon.jap_name,
+       'eng_name': requested_pokemon.eng_name,
+       'prev_evolution': requested_pokemon.evolves,  # Передаем объект
        'prev_image_url': evo_prev_img,
        'next_evolution': evo,  # Передаем объект
        'next_image_url': evo_next_img,
