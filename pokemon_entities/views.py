@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Pokemon, PokemonEntity
 from django.utils.timezone import localtime
 
-print("views.py loaded")
+
 MOSCOW_CENTER = [55.751244, 37.618423]
 DEFAULT_IMAGE_URL = (
     'https://vignette.wikia.nocookie.net/pokemon/images/6/6e/%21.png/revision'
@@ -16,35 +16,29 @@ DEFAULT_IMAGE_URL = (
 
 
 def add_pokemon(folium_map, lat, lon, image_url):
-    print("Hello, i work_1") 
     icon = folium.features.CustomIcon(
         image_url,
         icon_size=(50, 50),
-    )
-    print("Hello, i work_2") 
+    ) 
     folium.Marker(
         [lat, lon],
         # Warning! `tooltip` attribute is disabled intentionally
         # to fix strange folium cyrillic encoding bug
         icon=icon,
     ).add_to(folium_map)
-    print("Hello, i work_3") 
 
 def show_all_pokemons(request):
-    print("show_all_pokemons called")
     current_time = localtime()
     pokemons = PokemonEntity.objects.filter(
     appeared_at__lte=current_time,
     disappeared_at__gte=current_time
 )
-    print(f"Number of pokemons: {pokemons.count()}")
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
 
     for pokemon_entity in pokemons:
         pokemon = pokemon_entity.pokemon
         relative_image_path = pokemon.photo.url if pokemon.photo else DEFAULT_IMAGE_URL
         image_url = request.build_absolute_uri(relative_image_path)
-        print(f"Image URL: {image_url}")
         add_pokemon(
             folium_map, pokemon_entity.lat,
             pokemon_entity.lon,
@@ -71,14 +65,14 @@ def show_pokemon(request, pokemon_id):
     relative_image_path = requested_pokemon.photo.url if requested_pokemon.photo else DEFAULT_IMAGE_URL
     image_url = request.build_absolute_uri(relative_image_path)
 
-    if requested_pokemon.evolves:
-        evo_prev_img = requested_pokemon.evolves.photo.url if requested_pokemon.evolves.photo else DEFAULT_IMAGE_URL
-        evo_prev_title = requested_pokemon.evolves.title
+    if requested_pokemon.evolution:
+        evo_prev_img = requested_pokemon.evolution.photo.url if requested_pokemon.evolution.photo else DEFAULT_IMAGE_URL
+        evo_prev_title = requested_pokemon.evolution.title
     else:
         evo_prev_img = None
         evo_prev_title = None
 
-    evo = requested_pokemon.evo.first()
+    evo = requested_pokemon.evolves_into.first()
     if evo:
         evo_next_img = evo.photo.url if evo.photo else DEFAULT_IMAGE_URL
         evo_next_title = evo.title
@@ -92,7 +86,7 @@ def show_pokemon(request, pokemon_id):
        'description': requested_pokemon.description,
        'jap_name': requested_pokemon.jap_name,
        'eng_name': requested_pokemon.eng_name,
-       'prev_evolution': requested_pokemon.evolves,  # Передаем объект
+       'prev_evolution': requested_pokemon.evolution,  # Передаем объект
        'prev_image_url': evo_prev_img,
        'next_evolution': evo,  # Передаем объект
        'next_image_url': evo_next_img,
